@@ -1,0 +1,648 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marginalia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#efeae0;
+    --paper-raised:#f7f3ea;
+    --ink:#221f1a;
+    --ink-soft:#5a5347;
+    --ink-faint:#8a8175;
+    --rule:#d9d2c2;
+    --rule-strong:#c3b9a4;
+    --brick:#6e2c22;
+    --brick-soft:#8a4234;
+    --moss:#4b5d45;
+    --moss-soft:#f2f0e6;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(110,44,34,0.06), transparent 55%),
+      radial-gradient(ellipse at 100% 0%, rgba(75,93,69,0.05), transparent 50%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    min-height:100vh;
+  }
+  .app{
+    max-width:1040px;
+    margin:0 auto;
+    padding:40px 28px 80px;
+  }
+
+  @keyframes dropIn{
+    from{ opacity:0; transform:translateY(-10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeIn{
+    from{ opacity:0; }
+    to{ opacity:1; }
+  }
+  @keyframes cardIn{
+    from{ opacity:0; transform:translateY(8px) scale(0.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  @keyframes pulseGlow{
+    0%,100%{ box-shadow:0 0 0 0 rgba(110,44,34,0.16); }
+    50%{ box-shadow:0 0 0 6px rgba(110,44,34,0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+
+  /* ---- Header ---- */
+  .masthead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:3px solid var(--ink);
+    padding-bottom:18px;
+    margin-bottom:6px;
+    animation:dropIn .6s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .masthead h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:44px;
+    letter-spacing:-0.01em;
+    margin:0;
+    line-height:1;
+  }
+  .masthead .tagline{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-top:8px;
+    animation:fadeIn .7s ease .15s both;
+  }
+  .new-entry-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:rgba(239,234,224,0.92);
+    border:none;
+    padding:12px 18px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:background-color .2s ease, transform .15s ease, box-shadow .2s ease;
+    animation:fadeIn .6s ease .1s both;
+  }
+  .new-entry-btn:hover{ background:var(--brick); transform:translateY(-1px); box-shadow:0 6px 14px rgba(110,44,34,0.22); }
+  .new-entry-btn:active{ transform:translateY(0) scale(0.97); }
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-faint);
+    padding:8px 0 28px;
+    letter-spacing:0.03em;
+    animation:fadeIn .8s ease .2s both;
+  }
+
+  /* ---- Layout ---- */
+  .layout{
+    display:grid;
+    grid-template-columns:300px 1fr;
+    gap:36px;
+  }
+  @media (max-width:760px){
+    .layout{ grid-template-columns:1fr; }
+  }
+
+  /* ---- Index (sidebar list) ---- */
+  .index-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:14px;
+    display:block;
+  }
+  .entry-list{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .entry-card{
+    position:relative;
+    background:rgba(247,243,234,0.68);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    border:1px solid var(--rule);
+    padding:14px 16px 16px;
+    cursor:pointer;
+    transition:border-color .18s ease, transform .22s ease, box-shadow .18s ease, background-color .18s ease, opacity .22s ease;
+    animation:cardIn .45s cubic-bezier(.2,.8,.2,1) both;
+    animation-delay:var(--d, 0ms);
+  }
+  .entry-card + .entry-card{ margin-top:10px; }
+  .entry-card:hover{
+    border-color:var(--rule-strong);
+    transform:translateY(-3px);
+    background:rgba(247,243,234,0.9);
+    box-shadow:0 10px 22px rgba(34,31,26,0.10);
+  }
+  .entry-card.active{
+    border-color:var(--brick);
+    border-width:1px;
+    background:rgba(247,243,234,0.92);
+    box-shadow:inset 3px 0 0 var(--brick), 0 8px 18px rgba(34,31,26,0.08);
+  }
+  .entry-card.card-exit{
+    animation:none;
+    opacity:0;
+    transform:translateX(18px) scale(0.97);
+    pointer-events:none;
+  }
+  .entry-card .stamp{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.05em;
+    color:var(--brick);
+    background:rgba(110,44,34,0.07);
+    border:1px solid var(--brick-soft);
+    border-radius:999px;
+    padding:2px 8px;
+    transform:rotate(-2deg);
+    margin-bottom:8px;
+    transition:transform .25s ease;
+  }
+  .entry-card:hover .stamp{ transform:rotate(1deg); }
+  .entry-card h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:17px;
+    margin:0 0 4px;
+    line-height:1.25;
+  }
+  .entry-card p{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+    line-height:1.5;
+    display:-webkit-box;
+    /* -webkit-line-clamp:2; */
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .entry-card .delete-x{
+    position:absolute;
+    top:10px;
+    right:10px;
+    width:22px;
+    height:22px;
+    border:none;
+    background:transparent;
+    color:var(--ink-faint);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    cursor:pointer;
+    line-height:22px;
+    text-align:center;
+    border-radius:2px;
+    opacity:0;
+    transform:scale(0.85);
+    transition:opacity .18s ease, transform .18s ease, color .15s ease, background-color .15s ease;
+  }
+  .entry-card:hover .delete-x, .entry-card:focus-within .delete-x{ opacity:1; transform:scale(1); }
+  .entry-card .delete-x:hover{ color:var(--brick); background:rgba(242,240,230,0.9); }
+
+  .empty-index{
+    font-size:13px;
+    color:var(--ink-faint);
+    font-style:italic;
+    padding:18px 0;
+    border-top:1px dashed var(--rule-strong);
+  }
+
+  /* ---- Main pane ---- */
+  .main-pane{ min-height:420px; }
+
+  .view-enter{ animation:riseIn .4s cubic-bezier(.2,.8,.2,1) both; }
+
+  .welcome{
+    padding:60px 10px;
+    text-align:left;
+    border-top:1px dashed var(--rule-strong);
+  }
+  .welcome h2{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:24px;
+    color:var(--ink-soft);
+    margin:0 0 10px;
+  }
+  .welcome p{
+    color:var(--ink-faint);
+    font-size:14px;
+    max-width:36em;
+  }
+
+  /* reading view */
+  .reader .stamp{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.05em;
+    color:var(--brick);
+    background:rgba(110,44,34,0.07);
+    border:1px solid var(--brick-soft);
+    border-radius:999px;
+    padding:3px 10px;
+    transform:rotate(-1.5deg);
+    margin-bottom:16px;
+    animation:fadeIn .5s ease both;
+  }
+  .reader h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:32px;
+    line-height:1.15;
+    margin:0 0 18px;
+    animation:riseIn .45s ease .05s both;
+  }
+  .reader .body-text{
+    font-size:17px;
+    line-height:1.75;
+    color:var(--ink);
+    white-space:pre-wrap;
+    animation:fadeIn .6s ease .12s both;
+  }
+  .reader-actions{
+    margin-top:32px;
+    padding-top:16px;
+    border-top:1px solid var(--rule);
+    display:flex;
+    gap:10px;
+    animation:fadeIn .5s ease .18s both;
+  }
+  .ghost-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    background:rgba(247,243,234,0.5);
+    border:1px solid var(--rule-strong);
+    color:var(--ink-soft);
+    padding:9px 14px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:border-color .18s ease, color .18s ease, transform .15s ease, background-color .18s ease;
+  }
+  .ghost-btn:hover{ border-color:var(--brick); color:var(--brick); background:rgba(247,243,234,0.85); transform:translateY(-1px); }
+  .ghost-btn:active{ transform:translateY(0) scale(0.97); }
+
+  /* ---- Composer (new entry form) ---- */
+  .composer{ border-top:1px dashed var(--rule-strong); padding-top:24px; }
+  .composer label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:8px;
+  }
+  .composer input[type=text]{
+    width:100%;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:26px;
+    border:none;
+    border-bottom:2px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    padding:4px 0 10px;
+    margin-bottom:26px;
+    outline:none;
+  }
+  .composer input[type=text]::placeholder{ color:var(--ink-faint); font-weight:400; }
+  .composer input[type=text]{ transition:border-color .2s ease, box-shadow .2s ease; }
+  .composer textarea{
+    width:100%;
+    min-height:280px;
+    font-family:'Source Serif 4', serif;
+    font-size:16px;
+    line-height:1.7;
+    border:1px solid var(--rule);
+    background:rgba(247,243,234,0.6);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+    color:var(--ink);
+    padding:16px;
+    resize:vertical;
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+  }
+  .composer textarea::placeholder{ color:var(--ink-faint); }
+  .composer textarea:focus, .composer input[type=text]:focus{
+    border-color:var(--brick);
+    box-shadow:0 0 0 4px rgba(110,44,34,0.10);
+    background-color:rgba(247,243,234,0.85);
+  }
+  .composer-actions{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+  .primary-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    background:var(--brick);
+    color:rgba(239,234,224,0.94);
+    border:none;
+    padding:11px 20px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:background-color .18s ease, transform .15s ease, box-shadow .18s ease;
+  }
+  .primary-btn:hover{ background:var(--brick-soft); transform:translateY(-1px); box-shadow:0 6px 14px rgba(110,44,34,0.2); }
+  .primary-btn:active{ transform:translateY(0) scale(0.97); }
+  .primary-btn:disabled{ background:var(--rule-strong); cursor:not-allowed; transform:none; box-shadow:none; }
+
+  .error-note{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--brick);
+    margin-top:10px;
+    animation:riseIn .25s ease both;
+  }
+
+  .status-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    color:var(--ink-faint);
+    text-align:center;
+    margin-top:50px;
+    letter-spacing:0.05em;
+    transition:opacity .3s ease;
+  }
+
+  ::selection{ background:var(--moss-soft); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="masthead">
+    <div>
+      <h1>Pusthika</h1>
+      <div class="tagline">A private column for stray thoughts</div>
+    </div>
+    <button class="new-entry-btn" id="newEntryBtn">+ New entry</button>
+  </div>
+  <div class="meta-row">
+    <span id="entryCount">0 entries</span>
+    <span>Stored on this device</span>
+  </div>
+
+  <div class="layout">
+    <div class="index-col">
+      <span class="index-label">Index</span>
+      <div class="entry-list" id="entryList"></div>
+      <div class="empty-index" id="emptyIndex" style="display:none;">No entries yet. Start with "+ New entry."</div>
+    </div>
+
+    <div class="main-pane" id="mainPane"></div>
+  </div>
+
+  <div class="status-line" id="statusLine">loading&hellip;</div>
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'posts';
+  var posts = [];
+  var activeId = null;
+  var mode = 'welcome'; // welcome | reading | composing
+  var loaded = false;
+
+  var entryListEl = document.getElementById('entryList');
+  var emptyIndexEl = document.getElementById('emptyIndex');
+  var mainPaneEl = document.getElementById('mainPane');
+  var entryCountEl = document.getElementById('entryCount');
+  var statusLineEl = document.getElementById('statusLine');
+  var newEntryBtn = document.getElementById('newEntryBtn');
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function formatDate(iso){
+    var d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+  }
+
+  function excerpt(text){
+    var t = text.trim();
+    return t.length > 140 ? t.slice(0,140) + '…' : t;
+  }
+
+  async function loadPosts(){
+    try{
+      var res = await window.storage.get(STORAGE_KEY, false);
+      posts = res && res.value ? JSON.parse(res.value) : [];
+    }catch(e){
+      posts = [];
+    }
+    posts.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+    loaded = true;
+    setStatus('saved automatically to this device');
+    render();
+  }
+
+  async function savePosts(){
+    try{
+      var result = await window.storage.set(STORAGE_KEY, JSON.stringify(posts), false);
+      if(!result){ setStatus('could not save — storage unavailable'); }
+      else { setStatus('saved automatically to this device'); }
+    }catch(e){
+      setStatus('could not save — storage unavailable');
+    }
+  }
+
+  function render(){
+    renderIndex();
+    renderMain();
+  }
+
+  function renderIndex(){
+    entryListEl.innerHTML = '';
+    if(posts.length === 0){
+      emptyIndexEl.style.display = 'block';
+      entryCountEl.textContent = '0 entries';
+      return;
+    }
+    emptyIndexEl.style.display = 'none';
+    entryCountEl.textContent = posts.length + (posts.length === 1 ? ' entry' : ' entries');
+
+    posts.forEach(function(post, i){
+      var card = document.createElement('div');
+      card.className = 'entry-card' + (post.id === activeId && mode === 'reading' ? ' active' : '');
+      card.dataset.id = post.id;
+      card.style.setProperty('--d', Math.min(i, 10) * 40 + 'ms');
+      card.innerHTML =
+        '<button class="delete-x" title="Delete entry" aria-label="Delete entry">&times;</button>' +
+        '<span class="stamp">' + formatDate(post.date) + '</span>' +
+        '<h3></h3>' +
+        '<p></p>';
+      card.querySelector('h3').textContent = post.title || 'Untitled';
+      card.querySelector('p').textContent = excerpt(post.body || '');
+
+      card.addEventListener('click', function(e){
+        if(e.target.classList.contains('delete-x')) return;
+        activeId = post.id;
+        mode = 'reading';
+        render();
+      });
+      card.querySelector('.delete-x').addEventListener('click', function(e){
+        e.stopPropagation();
+        deletePost(post.id);
+      });
+      entryListEl.appendChild(card);
+    });
+  }
+
+  function renderMain(){
+    if(mode === 'composing'){
+      renderComposer();
+      return;
+    }
+    if(mode === 'reading'){
+      var post = posts.find(function(p){ return p.id === activeId; });
+      if(!post){ mode = 'welcome'; renderMain(); return; }
+      mainPaneEl.innerHTML =
+        '<div class="reader view-enter">' +
+          '<span class="stamp">' + formatDate(post.date) + '</span>' +
+          '<h2></h2>' +
+          '<div class="body-text"></div>' +
+          '<div class="reader-actions">' +
+            '<button class="ghost-btn" id="deleteBtn">Delete entry</button>' +
+            '<button class="ghost-btn" id="backBtn">Back to index</button>' +
+          '</div>' +
+        '</div>';
+      mainPaneEl.querySelector('h2').textContent = post.title || 'Untitled';
+      mainPaneEl.querySelector('.body-text').textContent = post.body || '';
+      mainPaneEl.querySelector('#deleteBtn').addEventListener('click', function(){ deletePost(post.id); });
+      mainPaneEl.querySelector('#backBtn').addEventListener('click', function(){ mode = 'welcome'; render(); });
+      return;
+    }
+    // welcome
+    mainPaneEl.innerHTML =
+      '<div class="welcome view-enter">' +
+        '<h2>Nothing selected yet.</h2>' +
+        '<p>Choose an entry from the index on the left to read it, or start a new one. Everything you write stays on this device.</p>' +
+      '</div>';
+  }
+
+  function renderComposer(){
+    mainPaneEl.innerHTML =
+      '<div class="composer view-enter">' +
+        '<label for="titleInput">Title</label>' +
+        '<input type="text" id="titleInput" placeholder="Give this entry a name" maxlength="120" />' +
+        '<label for="bodyInput">Entry</label>' +
+        '<textarea id="bodyInput" placeholder="Write what\'s on your mind&hellip;"></textarea>' +
+        '<div class="composer-actions">' +
+          '<button class="primary-btn" id="publishBtn">Publish entry</button>' +
+          '<button class="ghost-btn" id="cancelBtn">Cancel</button>' +
+        '</div>' +
+        '<div class="error-note" id="composerError" style="display:none;"></div>' +
+      '</div>';
+
+    var titleInput = mainPaneEl.querySelector('#titleInput');
+    var bodyInput = mainPaneEl.querySelector('#bodyInput');
+    var errorNote = mainPaneEl.querySelector('#composerError');
+
+    titleInput.focus();
+
+    mainPaneEl.querySelector('#publishBtn').addEventListener('click', function(){
+      var title = titleInput.value.trim();
+      var body = bodyInput.value.trim();
+      if(!title && !body){
+        errorNote.textContent = 'Write a title or some text before publishing.';
+        errorNote.style.display = 'block';
+        return;
+      }
+      var newPost = {
+        id: 'post_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+        title: title || 'Untitled',
+        body: body,
+        date: new Date().toISOString()
+      };
+      posts.unshift(newPost);
+      activeId = newPost.id;
+      mode = 'reading';
+      savePosts();
+      render();
+    });
+
+    mainPaneEl.querySelector('#cancelBtn').addEventListener('click', function(){
+      mode = posts.length ? 'welcome' : 'welcome';
+      render();
+    });
+  }
+
+  function deletePost(id){
+    var cardEl = entryListEl.querySelector('.entry-card[data-id="' + id + '"]');
+    var finish = function(){
+      posts = posts.filter(function(p){ return p.id !== id; });
+      if(activeId === id){
+        activeId = null;
+        mode = 'welcome';
+      }
+      savePosts();
+      render();
+    };
+    if(cardEl){
+      cardEl.classList.add('card-exit');
+      setTimeout(finish, 220);
+    } else {
+      finish();
+    }
+  }
+
+  function setStatus(text){
+    statusLineEl.style.opacity = '0';
+    setTimeout(function(){
+      statusLineEl.textContent = text;
+      statusLineEl.style.opacity = '1';
+    }, 180);
+  }
+
+  newEntryBtn.addEventListener('click', function(){
+    mode = 'composing';
+    render();
+  });
+
+  loadPosts();
+})();
+</script>
+
+</body>
+</html>

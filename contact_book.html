@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contact Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDEAE1;
+    --card: #FFFFFF;
+    --ink: #262420;
+    --ink-soft: #6B675E;
+    --ink-faint: #A8A296;
+    --border: #DAD4C5;
+    --border-strong: #C7BFA9;
+    --tab-red: #B33F2C;
+    --tab-red-ink: #FFF3EE;
+    --index-teal: #235C52;
+    --danger: #B33F2C;
+    --danger-bg: #F7E9E5;
+    --focus: #235C52;
+    --radius: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1D1B17;
+      --card: #29261F;
+      --ink: #ECE7DC;
+      --ink-soft: #B5AE9C;
+      --ink-faint: #7A7566;
+      --border: #3D392F;
+      --border-strong: #4D483B;
+      --tab-red: #D4644E;
+      --tab-red-ink: #2A1712;
+      --index-teal: #4FA294;
+      --danger: #D4644E;
+      --danger-bg: #3A241E;
+      --focus: #4FA294;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
+  }
+
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1.5px solid var(--border-strong);
+    padding-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 2.1rem;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .tagline {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .count-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .storage-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    margin: 0.4rem 0 0;
+  }
+
+  /* new-card form */
+  .new-card {
+    position: relative;
+    background: var(--card);
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.5rem 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .new-card-tab {
+    position: absolute;
+    top: -0.65rem;
+    left: 1.25rem;
+    background: var(--tab-red);
+    color: var(--tab-red-ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .field label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin-bottom: 0.35rem;
+  }
+
+  .field input {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .field input::placeholder { color: var(--ink-faint); }
+
+  .field input:focus,
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 20%, transparent);
+  }
+
+  .new-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .error-msg {
+    font-size: 0.82rem;
+    color: var(--danger);
+    margin: 0;
+  }
+
+  button {
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* search */
+  .search-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-box {
+    flex: 1;
+    position: relative;
+  }
+
+  .search-box input {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 2.1rem 0.6rem 0.85rem;
+  }
+
+  .search-clear {
+    position: absolute;
+    right: 0.4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    font-size: 1rem;
+    padding: 0.3rem;
+    line-height: 1;
+    display: none;
+  }
+
+  .search-clear.show { display: block; }
+
+  /* body layout */
+  .directory-layout {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .directory {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .letter-group-label {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--card);
+    background: var(--index-teal);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    margin-bottom: 0.6rem;
+    scroll-margin-top: 1rem;
+  }
+
+  .contact-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.85rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .avatar {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .contact-info { flex: 1; min-width: 0; }
+
+  .contact-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .contact-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    margin: 0.2rem 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-btn {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--ink-soft);
+    padding: 0.4rem 0.55rem;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  .icon-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  .confirm-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .confirm-row span {
+    font-size: 0.85rem;
+    color: var(--danger);
+  }
+
+  .confirm-actions { display: flex; gap: 0.5rem; }
+
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  /* alphabet rail */
+  .rail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 0.2rem;
+  }
+
+  .rail button {
+    width: 22px;
+    height: 18px;
+    border: none;
+    background: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+    border-radius: 3px;
+  }
+
+  .rail button.active {
+    color: var(--card);
+    background: var(--tab-red);
+    font-weight: 500;
+  }
+
+  .rail button:disabled { cursor: default; }
+  .rail button.active:hover { opacity: 0.85; }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--ink-soft);
+  }
+
+  .empty-state p:first-child {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+  }
+
+  .empty-state p { margin: 0; font-size: 0.9rem; }
+
+  /* mobile */
+  @media (max-width: 640px) {
+    .field-row { grid-template-columns: 1fr; }
+    .directory-layout { grid-template-columns: 1fr; }
+    .rail {
+      flex-direction: row;
+      overflow-x: auto;
+      padding-bottom: 0.3rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .rail button { flex-shrink: 0; width: 24px; }
+    header { align-items: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h2 class="sr-only">Contact book application: add, view, search, and delete contacts</h2>
+
+  <header>
+    <div>
+      <h1>Contact Book</h1>
+      <p class="tagline">A place for the people you don't want to lose.</p>
+      <p class="storage-note" id="storage-note"></p>
+    </div>
+    <div class="count-badge" id="count-badge">0 contacts</div>
+  </header>
+
+  <form class="new-card" id="add-form" novalidate>
+    <div class="new-card-tab">New card</div>
+    <div class="field-row">
+      <div class="field">
+        <label for="f-name">Name</label>
+        <input id="f-name" name="name" type="text" placeholder="Full name" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="f-phone">Phone</label>
+        <input id="f-phone" name="phone" type="tel" placeholder="+1 555 000 1234" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="f-email">Email</label>
+        <input id="f-email" name="email" type="email" placeholder="name@example.com" autocomplete="off" />
+      </div>
+    </div>
+    <div class="new-card-footer">
+      <p class="error-msg" id="form-error" style="display:none;"></p>
+      <button type="submit" class="btn-primary">Add to book</button>
+    </div>
+  </form>
+
+  <div class="search-row">
+    <div class="search-box">
+      <input id="search-input" type="text" placeholder="Search by name…" aria-label="Search contacts by name" />
+      <button class="search-clear" id="search-clear" aria-label="Clear search">&times;</button>
+    </div>
+  </div>
+
+  <div class="directory-layout">
+    <div id="directory" class="directory"></div>
+    <nav class="rail" id="rail" aria-label="Jump to letter"></nav>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  var hasStorage = typeof window !== 'undefined' && !!window.storage;
+  var contacts = [];
+  var confirmDeleteId = null;
+
+  var form = document.getElementById('add-form');
+  var nameInput = document.getElementById('f-name');
+  var phoneInput = document.getElementById('f-phone');
+  var emailInput = document.getElementById('f-email');
+  var errorMsg = document.getElementById('form-error');
+  var searchInput = document.getElementById('search-input');
+  var searchClear = document.getElementById('search-clear');
+  var directoryEl = document.getElementById('directory');
+  var railEl = document.getElementById('rail');
+  var countBadge = document.getElementById('count-badge');
+  var storageNote = document.getElementById('storage-note');
+
+  storageNote.textContent = hasStorage
+    ? 'Saved automatically.'
+    : 'Opened outside Claude — contacts will reset on reload.';
+
+  function initials(name) {
+    var parts = name.trim().split(/\s+/);
+    var a = parts[0] ? parts[0][0] : '';
+    var b = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    return (a + b).toUpperCase();
+  }
+
+  function showFormError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.style.display = 'block';
+  }
+  function clearFormError() {
+    errorMsg.style.display = 'none';
+    errorMsg.textContent = '';
+  }
+
+  async function loadContacts() {
+    if (!hasStorage) return [];
+    try {
+      var result = await window.storage.get('contacts', false);
+      if (result && result.value) {
+        var parsed = JSON.parse(result.value);
+        if (Array.isArray(parsed)) return parsed;
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async function persist() {
+    if (!hasStorage) return;
+    try {
+      await window.storage.set('contacts', JSON.stringify(contacts), false);
+    } catch (e) {
+      console.error('Could not save contacts:', e);
+    }
+  }
+
+  function render() {
+    var query = searchInput.value.trim().toLowerCase();
+    searchClear.classList.toggle('show', query.length > 0);
+
+    var filtered = contacts.filter(function (c) {
+      return c.name.toLowerCase().indexOf(query) !== -1;
+    });
+    filtered.sort(function (a, b) { return a.name.localeCompare(b.name); });
+
+    countBadge.textContent = contacts.length + (contacts.length === 1 ? ' contact' : ' contacts');
+
+    // group by first letter
+    var groups = {};
+    filtered.forEach(function (c) {
+      var letter = c.name.trim()[0] ? c.name.trim()[0].toUpperCase() : '#';
+      if (!/[A-Z]/.test(letter)) letter = '#';
+      if (!groups[letter]) groups[letter] = [];
+      groups[letter].push(c);
+    });
+
+    directoryEl.innerHTML = '';
+
+    if (filtered.length === 0) {
+      var empty = document.createElement('div');
+      empty.className = 'empty-state';
+      if (contacts.length === 0) {
+        empty.innerHTML = '<p>Your book is empty.</p><p>Add your first contact using the card above.</p>';
+      } else {
+        empty.innerHTML = '<p>No matches.</p><p>Nobody in your book matches "' + escapeHtml(searchInput.value.trim()) + '".</p>';
+      }
+      directoryEl.appendChild(empty);
+    } else {
+      LETTERS.concat(['#']).forEach(function (letter) {
+        if (!groups[letter]) return;
+        var groupWrap = document.createElement('div');
+
+        var label = document.createElement('div');
+        label.className = 'letter-group-label';
+        label.id = 'group-' + letter;
+        label.textContent = letter;
+        groupWrap.appendChild(label);
+
+        groups[letter].forEach(function (c) {
+          groupWrap.appendChild(buildCard(c));
+        });
+
+        directoryEl.appendChild(groupWrap);
+      });
+    }
+
+    renderRail(groups);
+  }
+
+  function buildCard(c) {
+    var card = document.createElement('div');
+    card.className = 'contact-card';
+
+    if (confirmDeleteId === c.id) {
+      var confirmRow = document.createElement('div');
+      confirmRow.className = 'confirm-row';
+
+      var span = document.createElement('span');
+      span.textContent = 'Delete ' + c.name + '?';
+
+      var actions = document.createElement('div');
+      actions.className = 'confirm-actions';
+
+      var yesBtn = document.createElement('button');
+      yesBtn.className = 'btn-danger';
+      yesBtn.type = 'button';
+      yesBtn.textContent = 'Delete';
+      yesBtn.addEventListener('click', function () {
+        contacts = contacts.filter(function (x) { return x.id !== c.id; });
+        confirmDeleteId = null;
+        persist();
+        render();
+      });
+
+      var noBtn = document.createElement('button');
+      noBtn.className = 'btn-ghost';
+      noBtn.type = 'button';
+      noBtn.textContent = 'Cancel';
+      noBtn.addEventListener('click', function () {
+        confirmDeleteId = null;
+        render();
+      });
+
+      actions.appendChild(yesBtn);
+      actions.appendChild(noBtn);
+      confirmRow.appendChild(span);
+      confirmRow.appendChild(actions);
+      card.appendChild(confirmRow);
+      return card;
+    }
+
+    var avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = initials(c.name);
+
+    var info = document.createElement('div');
+    info.className = 'contact-info';
+    var nameEl = document.createElement('p');
+    nameEl.className = 'contact-name';
+    nameEl.textContent = c.name;
+    var metaEl = document.createElement('p');
+    metaEl.className = 'contact-meta';
+    metaEl.textContent = c.phone + '  ·  ' + c.email;
+    info.appendChild(nameEl);
+    info.appendChild(metaEl);
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'icon-btn';
+    delBtn.type = 'button';
+    delBtn.setAttribute('aria-label', 'Delete ' + c.name);
+    delBtn.textContent = '✕';
+    delBtn.addEventListener('click', function () {
+      confirmDeleteId = c.id;
+      render();
+    });
+
+    card.appendChild(avatar);
+    card.appendChild(info);
+    card.appendChild(delBtn);
+    return card;
+  }
+
+  function renderRail(groups) {
+    railEl.innerHTML = '';
+    LETTERS.forEach(function (letter) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = letter;
+      var active = !!groups[letter];
+      if (active) {
+        btn.classList.add('active');
+        btn.addEventListener('click', function () {
+          var target = document.getElementById('group-' + letter);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      } else {
+        btn.disabled = true;
+      }
+      railEl.appendChild(btn);
+    });
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = nameInput.value.trim();
+    var phone = phoneInput.value.trim();
+    var email = emailInput.value.trim();
+
+    if (!name || !phone || !email) {
+      showFormError('Fill in name, phone, and email.');
+      return;
+    }
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      showFormError('Enter a valid email address.');
+      return;
+    }
+    clearFormError();
+
+    contacts.push({
+      id: 'c_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+      name: name,
+      phone: phone,
+      email: email
+    });
+
+    nameInput.value = '';
+    phoneInput.value = '';
+    emailInput.value = '';
+    nameInput.focus();
+
+    persist();
+    render();
+  });
+
+  searchInput.addEventListener('input', render);
+  searchClear.addEventListener('click', function () {
+    searchInput.value = '';
+    searchInput.focus();
+    render();
+  });
+
+  (async function init() {
+    contacts = await loadContacts();
+    render();
+  })();
+})();
+</script>
+</body>
+</html>
