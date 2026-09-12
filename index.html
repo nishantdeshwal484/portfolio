@@ -19,6 +19,7 @@
         --lime: #c7f36b;
         --coral: #ff725e;
         --line: rgba(23, 33, 27, 0.18);
+        --page-gradient: linear-gradient(135deg, #f4f1e9 0%, #e5f0d9 52%, #f8d8cf 100%);
         --display: "Space Grotesk", sans-serif;
         --mono: "DM Mono", monospace;
       }
@@ -32,7 +33,7 @@
       body {
         margin: 0;
         color: var(--ink);
-        background: var(--paper);
+        background: var(--page-gradient);
         font-family: var(--display);
         overflow-x: hidden;
       }
@@ -1427,6 +1428,24 @@
       </div>
     </footer>
     <script>
+      const pageGradients = [
+        "linear-gradient(135deg, #f4f1e9 0%, #e5f0d9 52%, #f8d8cf 100%)",
+        "linear-gradient(135deg, #f4f1e9 0%, #d8eaf2 52%, #f5dfb8 100%)",
+        "linear-gradient(135deg, #f4f1e9 0%, #eadcf2 52%, #d8eee5 100%)",
+        "linear-gradient(135deg, #f4f1e9 0%, #f5e2c9 52%, #dce8f4 100%)",
+      ];
+      const previousGradient = Number(
+        sessionStorage.getItem("portfolio-gradient-index"),
+      );
+      const nextGradient = Number.isInteger(previousGradient)
+        ? (previousGradient + 1) % pageGradients.length
+        : 0;
+      sessionStorage.setItem("portfolio-gradient-index", nextGradient);
+      document.body.style.setProperty(
+        "--page-gradient",
+        pageGradients[nextGradient],
+      );
+
       const menuButton = document.querySelector(".menu-button");
       const nav = document.querySelector(".nav");
       const progress = document.querySelector(".scroll-progress");
