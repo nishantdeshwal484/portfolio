@@ -124,7 +124,7 @@
         justify-content: space-between;
         padding: 24px 0;
         position: relative;
-        z-index: 2;
+        z-index: 5;
       }
       .logo {
         font-size: 1.1rem;
@@ -159,7 +159,26 @@
         border: 0;
         cursor: pointer;
         display: none;
-        padding: 6px;
+        padding: 8px;
+        position: relative;
+        z-index: 5;
+      }
+      .menu-button span {
+        background: currentColor;
+        display: block;
+        height: 2px;
+        margin: 5px 0;
+        transition: transform 0.25s ease, opacity 0.25s ease;
+        width: 25px;
+      }
+      .menu-button[aria-expanded="true"] span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .menu-button[aria-expanded="true"] span:nth-child(2) {
+        opacity: 0;
+      }
+      .menu-button[aria-expanded="true"] span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
       }
 
       .hero {
@@ -839,6 +858,7 @@
         }
         .nav {
           background: var(--ink);
+          box-shadow: 8px 8px 0 var(--coral);
           color: var(--paper);
           display: none;
           flex-direction: column;
@@ -846,11 +866,15 @@
           padding: 24px;
           position: absolute;
           right: 0;
-          top: 62px;
-          width: min(190px, calc(100vw - 32px));
+          top: calc(100% - 2px);
+          width: min(230px, calc(100vw - 32px));
+          z-index: 4;
         }
         .nav.open {
           display: flex;
+        }
+        .nav a {
+          width: 100%;
         }
         .hero {
           min-height: 860px;
@@ -942,12 +966,15 @@
       <button
         class="menu-button"
         type="button"
-        aria-label="Open menu"
+        aria-label="Open navigation menu"
         aria-expanded="false"
+        aria-controls="site-navigation"
       >
-        ☰
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
-      <nav class="nav" aria-label="Main navigation">
+      <nav id="site-navigation" class="nav" aria-label="Main navigation">
         <a href="#about">About</a>
         <a href="#experience">Experience</a>
         <a href="#work">Work</a>
@@ -1485,16 +1512,32 @@
         menuButton.setAttribute("aria-expanded", isOpen);
         menuButton.setAttribute(
           "aria-label",
-          isOpen ? "Close menu" : "Open menu",
+          isOpen ? "Close navigation menu" : "Open navigation menu",
         );
       });
+      const closeMenu = () => {
+        nav.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Open navigation menu");
+      };
       nav.querySelectorAll("a").forEach((link) =>
-        link.addEventListener("click", () => {
-          nav.classList.remove("open");
-          menuButton.setAttribute("aria-expanded", "false");
-          menuButton.setAttribute("aria-label", "Open menu");
-        }),
+        link.addEventListener("click", closeMenu),
       );
+      document.addEventListener("click", (event) => {
+        if (
+          nav.classList.contains("open") &&
+          !nav.contains(event.target) &&
+          !menuButton.contains(event.target)
+        ) {
+          closeMenu();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeMenu();
+      });
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 700) closeMenu();
+      });
     </script>
   </body>
 </html>
