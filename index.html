@@ -155,6 +155,51 @@
       .nav .resume-button:hover {
         border-color: var(--coral);
       }
+      .theme-toggle {
+        align-items: center;
+        background: transparent;
+        border: 1px solid currentColor;
+        color: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        gap: 8px;
+        padding: 10px 14px;
+        text-transform: uppercase;
+      }
+      .theme-toggle:hover,
+      .theme-toggle:focus-visible {
+        border-color: var(--coral);
+        color: var(--coral);
+      }
+      .theme-toggle svg {
+        fill: none;
+        height: 16px;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+        width: 16px;
+      }
+      .theme-icon-sun { display: none; }
+      body[data-theme="dark"] .theme-icon-moon { display: none; }
+      body[data-theme="dark"] .theme-icon-sun { display: block; }
+      body[data-theme="dark"] {
+        --ink: #edf2e9;
+        --muted: #a5b1a5;
+        --paper: #111611;
+        --paper-deep: #202820;
+        --lime: #c7f36b;
+        --coral: #ff8066;
+        --line: rgba(237, 242, 233, 0.16);
+        color-scheme: dark;
+      }
+      body[data-theme="dark"]::before { opacity: 0.08; }
+      body[data-theme="dark"] .section { background: rgba(17, 22, 17, 0.32); }
+      body[data-theme="dark"] .project { background: #1a211b; }
+      body[data-theme="dark"] .certificate-preview { background: #242c24; }
+      body[data-theme="dark"] .nav { background: var(--paper); color: var(--ink); }
       .menu-button {
         background: none;
         border: 0;
@@ -877,6 +922,10 @@
         .nav a {
           width: 100%;
         }
+        .theme-toggle {
+          justify-content: center;
+          width: 100%;
+        }
         .hero {
           min-height: 860px;
           overflow: hidden;
@@ -982,6 +1031,11 @@
         <a href="#education">Education</a>
         <a href="#contact">Contact</a>
         <a class="resume-button" href="nishant_resume.pdf" download="nishant_resume.pdf">Resume ↓</a>
+        <button class="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z" /></svg>
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></svg>
+          <span class="theme-label">Dark theme</span>
+        </button>
       </nav>
     </header>
 
@@ -1448,6 +1502,28 @@
 
       const menuButton = document.querySelector(".menu-button");
       const nav = document.querySelector(".nav");
+      const themeButton = document.querySelector(".theme-toggle");
+      const themeLabel = themeButton.querySelector(".theme-label");
+      let darkMode = localStorage.getItem("portfolio-theme") === "dark";
+      const applyTheme = () => {
+        document.body.dataset.theme = darkMode ? "dark" : "light";
+        document.body.style.setProperty(
+          "--page-gradient",
+          darkMode ? "#111611" : pageGradients[nextGradient],
+        );
+        themeButton.setAttribute("aria-pressed", String(darkMode));
+        themeButton.setAttribute(
+          "aria-label",
+          darkMode ? "Switch to light theme" : "Switch to dark theme",
+        );
+        themeLabel.textContent = darkMode ? "Light theme" : "Dark theme";
+      };
+      applyTheme();
+      themeButton.addEventListener("click", () => {
+        darkMode = !darkMode;
+        localStorage.setItem("portfolio-theme", darkMode ? "dark" : "light");
+        applyTheme();
+      });
       const progress = document.querySelector(".scroll-progress");
       const cursorRing = document.querySelector(".cursor-ring");
       const revealItems = document.querySelectorAll(".reveal");
